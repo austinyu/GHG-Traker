@@ -39,14 +39,18 @@
 
 Any updates?
 
+## Features
 
+- Cols needed 
+  - country
+  - co2
+  - population
+  - gdp
 
-
-
-
-branch 0918
-
-
-
-branch 0920
-
+- Layers 
+  - Total CO2
+  - Year. 
+  - CO2 per capita 
+    - cumulative 
+    - new emission 
+  - 
