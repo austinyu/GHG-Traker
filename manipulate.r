@@ -23,6 +23,9 @@ maniDF <- rawDF %>% mutate(country = case_when(
 
 selectDF <- maniDF[, c("country", "year", "co2", "population", "gdp")]
 
+
+
+
 year <- 2000
 yearDF = selectDF %>% filter(year == 2000)
 
