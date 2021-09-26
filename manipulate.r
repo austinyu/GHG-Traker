@@ -8,18 +8,23 @@ library(tidyverse)
 
 rawDF <- read_csv("raw_data/owid-co2-data.csv") 
 
+# This block visualizes the trends of total co2 emossion by year 
 observationDF <- rawDF %>% 
   group_by(year) %>% 
   summarise(total = sum(co2))
 observationDF %>%  ggplot(mapping = aes(x = year, y = total)) +
   geom_smooth()
 
-rawDF %>% filter(year > 1900) 
+rawDF %>% filter(year > 1850) 
+
+ max(rawDF $ year)
 
 maniDF <- rawDF %>% mutate(country = case_when(
   country == "United States" ~ "United States of America",
   TRUE ~ country
 ))
+
+maniDF %>% write_csv("input_data/rawDF.csv")
 
 selectDF <- maniDF[, c("country", "year", "co2", "population", "gdp")]
 
