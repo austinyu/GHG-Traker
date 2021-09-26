@@ -41,16 +41,51 @@ Any updates?
 
 ## Features
 
-- Cols needed 
+- Basic Info
+  - Iso_code
   - country
-  - co2
-  - population
+  - year
   - gdp
+  - population
+- co2
+  - co2
+  - Cumulative_co2
+  - Co2_per_gdp
+  - co2_per_unit_energy
+- source
+  - Cement_co2
+  - Coal_co2
+  - Flaring_co2
+  - Gas_co2
+  - Oil_co2
+- green house gas
+  - co2
+  - methane 
+  - Nitrous_oxide 
 
-- Layers 
-  - Total CO2
-  - Year. 
-  - CO2 per capita 
-    - cumulative 
-    - new emission 
-  - 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
