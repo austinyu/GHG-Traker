@@ -1,50 +1,51 @@
 library(shiny)
 library(leaflet)
 library(RColorBrewer)
+library(ggplot2)
+library(tidyverse) 
+library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
+library(dplyr)      # Used for data manipulation and merging
+library(htmltools)  # Used for constructing map labels using HTML
 
 
-rawDF <- read_csv("input_data/rawDF.csv") 
-selectDF <- rawDF[, c("country", "year", "co2")]
-shapeurl <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
-WorldCountry <- geojson_read(shapeurl, what = "sp")
 
 
 # Define UI for app that draws a histogram ----
-ui <- bootstrapPage(
-  #tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-  leafletOutput("map", width = "100%", height = "100%"),
-  # Sidebar panel for inputs ----
-  absolutePanel(top = 10, right = 10,
-    # Input: Slider for the number of bins ----
-    sliderInput(inputId = "year",
-                label = "Year:",
-                min = 1850,
-                max = 2019,
-                value = 2000)
+ui <- fluidPage(
+  titlePanel("GHG Emission"),
+  sidebarLayout(
+    sliderInput("year", "Year:",
+                min = min(selectDF $  year), max = max(selectDF $  year),
+                value = 2000),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("tab1", leafletOutput("map")),
+        tabPanel("tab2")
+      )
     )
+  )
 )
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
-  #year <- reactive({input$year})
-  yearDF = reactive({selectDF %>% filter(year == input$year)})
-  joinDF <- left_join(data.frame(Name = WorldCountry$name), selectDF, by = c("Name" ="country"))
-  pal <- colorBin("magma", domain = joinDF$co2)
-  myLabels <- paste("<strong>", joinDF$Name, "</strong>", "<br/>", 
-                    "CO2:", joinDF$co2)
+  rawDF <- read_csv("input_data/rawDF.csv") 
+  selectDF <- rawDF[, c("country", "year", "co2")]
+  shapeurl <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+  WorldCountry <- geojson_read(shapeurl, what = "sp")
   
-  
-  output$map <- renderLeaflet({.
-    leaflet(WorldCountry) %>% 
-    addTiles() 
+  yearDF <- reactive({
+    return(left_join(data.frame(Name = WorldCountry$name), selectDF %>% 
+                       filter(year == input$year), by = c("Name" ="country")))
   })
   
-  observe({
-    leafletProxy("map") %>%
-      clearShapes() %>%
+  pal <- reactive({
+    colorBin("magma", domain = yearDF()$co2)})
+  
+  output$map <- renderLeaflet(
+    leaflet(WorldCountry) %>% 
+      addTiles() %>% 
       addPolygons(
-        data = yearDF,
-        fillColor = pal(joinDF$co2),
+        fillColor = ~(pal()(yearDF()$co2)),
         weight = 2,
         opacity = 1,
         color = "white",
@@ -54,10 +55,12 @@ server <- function(input, output) {
           color = "grey",
           fillOpacity = 0.7,
           bringToFront = TRUE), 
-        label = lapply(myLabels, HTML)) %>% 
-      addLegend(pal = pal, values = joinDF$co2,
+        label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>", 
+                             "CO2:", yearDF()$co2)
+                       , HTML)) %>% 
+      addLegend(pal = pal(), values = yearDF()$co2,
                 title = "CO2", position = "bottomright")
-  })
+  )
   
 }
 
