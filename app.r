@@ -1,3 +1,4 @@
+
 library(shiny)
 library(leaflet)
 library(RColorBrewer)
@@ -6,8 +7,6 @@ library(tidyverse)
 library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
 library(dplyr)      # Used for data manipulation and merging
 library(htmltools)  # Used for constructing map labels using HTML
-
-
 
 
 # Define UI for app that draws a histogram ----
