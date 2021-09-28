@@ -63,7 +63,14 @@ Any updates?
   - methane 
   - Nitrous_oxide 
 
+## Assignment
 
+- Line Plot
+  - see the photo
+  - by country, sources, year, GHG type 
+- Bar Chart / piechart 
+  - Top 10 emissions 
+- 
 
 
 
