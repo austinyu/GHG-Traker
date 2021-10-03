@@ -15,7 +15,7 @@ observationDF <- rawDF %>%
 observationDF %>%  ggplot(mapping = aes(x = year, y = total)) +
   geom_smooth()
 
-rawDF %>% filter(year > 1850) 
+rawDF <- rawDF %>% filter(year > 1850) 
 
  max(rawDF $ year)
 
