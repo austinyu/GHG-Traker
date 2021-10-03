@@ -8,13 +8,15 @@ library(geojsonio)  # A package for geographic and spatial data, requires the la
 library(dplyr)      # Used for data manipulation and merging
 library(htmltools)  # Used for constructing map labels using HTML
 
+rawDF <- read_csv("input_data/rawDF.csv") 
+selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp")]
 
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
   titlePanel("GHG Emission"),
   sidebarLayout(
     sliderInput("year", "Year:",
-                min = 1851, max = 2019,
+                min = min(selectDF$year), max = max(selectDF$year),
                 value = 2000),
     mainPanel(
       
@@ -29,8 +31,6 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
-  rawDF <- read_csv("input_data/rawDF.csv") 
-  selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp")]
   shapeurl <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
   WorldCountry <- geojson_read(shapeurl, what = "sp")
   
