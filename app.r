@@ -14,15 +14,15 @@ ui <- fluidPage(
   titlePanel("GHG Emission"),
   sidebarLayout(
     sliderInput("year", "Year:",
-                min = min(selectDF $  year), max = max(selectDF $  year),
+                min = 1851, max = 2019,
                 value = 2000),
     mainPanel(
       
       tabsetPanel(type = "tabs",
                   tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
-                  tabPanel("Emission Per Capita", leafletOutput("mapPerCap"))
+                  tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
+                  tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
       )
-        
     )
   )
 )
@@ -30,7 +30,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
   rawDF <- read_csv("input_data/rawDF.csv") 
-  selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita")]
+  selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp")]
   shapeurl <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
   WorldCountry <- geojson_read(shapeurl, what = "sp")
   
@@ -38,9 +38,10 @@ server <- function(input, output) {
     return(left_join(data.frame(Name = WorldCountry$name), selectDF %>% 
                        filter(year == input$year), by = c("Name" ="country")))
   })
+  
+  
   pal_PerYear <- reactive({
     colorBin("magma", domain = yearDF()$co2)})
-  
   mapPerYear <- renderLeaflet(
     leaflet(WorldCountry) %>% 
       addTiles() %>% 
@@ -61,12 +62,10 @@ server <- function(input, output) {
       addLegend(pal = pal_PerYear(), values = yearDF()$co2,
                 title = "CO2", position = "bottomright")
   )
-  
   output$mapPerYear <- mapPerYear
   
   pal_PerCap <- reactive({
     colorBin("magma", domain = yearDF()$co2_per_capita)})
-  
   mapPerCap <- renderLeaflet(
     leaflet(WorldCountry) %>% 
       addTiles() %>% 
@@ -85,9 +84,33 @@ server <- function(input, output) {
                              "CO2:", yearDF()$co2_per_capita)
                        , HTML)) %>% 
       addLegend(pal = pal_PerCap(), values = yearDF()$co2_per_capita,
-                title = "CO2", position = "bottomright")
+                title = "CO2 per Capita", position = "bottomright")
   )
   output$mapPerCap <- mapPerCap
+  
+  pal_PerGDP <- reactive({
+    colorBin("magma", domain = yearDF()$co2_per_gdp)})
+  mapPerGDP <- renderLeaflet(
+    leaflet(WorldCountry) %>% 
+      addTiles() %>% 
+      addPolygons(
+        fillColor = ~(pal_PerGDP()(yearDF()$co2_per_gdp)),
+        weight = 2,
+        opacity = 1,
+        color = "white",
+        fillOpacity = 0.7, 
+        highlight = highlightOptions(
+          weight = 3,
+          color = "grey",
+          fillOpacity = 0.7,
+          bringToFront = TRUE), 
+        label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>", 
+                             "CO2:", yearDF()$co2_per_gdp)
+                       , HTML)) %>% 
+      addLegend(pal = pal_PerGDP(), values = yearDF()$co2_per_gdp,
+                title = "CO2 per GDP", position = "bottomright")
+  )
+  output$mapPerGDP <- mapPerGDP
 }
 
 
