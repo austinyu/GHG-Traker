@@ -15,22 +15,22 @@ selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
 catOfDF <- vector(mode="list", length=4)
 names(catOfDF) <- c("total_ghg", "co2", "methane", "nitrous_oxide")
 catOfDF[[1]] <- selectDF %>% 
-  select("total_ghg", "ghg_per_capita", "ghg_per_gdp") %>% 
+  select("country", "year", "total_ghg", "ghg_per_capita", "ghg_per_gdp") %>% 
   rename( "total" = "total_ghg",
           "per_capita" = "ghg_per_capita",
           "per_gdp" = "ghg_per_gdp")
 catOfDF[[2]] <- selectDF %>% 
-  select("co2", "co2_per_capita", "co2_per_gdp") %>% 
+  select("country", "year", "co2", "co2_per_capita", "co2_per_gdp") %>% 
   rename( "total" = "co2",
           "per_capita" = "co2_per_capita",
           "per_gdp" = "co2_per_gdp")
 catOfDF[[3]] <- selectDF %>%  
-  select("methane", "methane_per_capita", "methane_per_gdp") %>% 
+  select("country", "year", "methane", "methane_per_capita", "methane_per_gdp") %>% 
   rename( "total" = "methane",
           "per_capita" = "methane_per_capita",
           "per_gdp" = "methane_per_gdp")
 catOfDF[[4]] <- selectDF %>% 
-  select("nitrous_oxide", "nitrous_oxide_per_capita", "nitrous_oxide_per_gdp") %>% 
+  select("country", "year", "nitrous_oxide", "nitrous_oxide_per_capita", "nitrous_oxide_per_gdp") %>% 
   rename( "total" = "nitrous_oxide",
           "per_capita" = "nitrous_oxide_per_capita",
           "per_gdp" = "nitrous_oxide_per_gdp")
@@ -49,10 +49,10 @@ ui <- navbarPage(
                     min = min(selectDF$year), max = max(selectDF$year),
                     value = 2000),
         selectInput("species", "Select a type of GHG:", 
-                    c("Total GHG" = 1,
-                      "CO2" = 2,
-                      "Methane" = 3,
-                      "Nitrous Oxide" = 4))
+                    c("Total GHG" = "total_ghg",
+                      "CO2" = "co2",
+                      "Methane" = 'methane',
+                      "Nitrous Oxide" = 'nitrous_oxide'))
       ),
       mainPanel(
         tabsetPanel(type = "tabs",
@@ -63,9 +63,8 @@ ui <- navbarPage(
       )
     )
   )
-  #tabPanel(
-  #  tltle = "Under Construction"
-  #)
+  # tabPanel("Graphs", leafletOutput("mapPerYear")),
+  # tabPanel("Data", leafletOutput("mapPerYear"))
 )
 
 # Define server logic required to draw a histogram ----
@@ -78,14 +77,14 @@ server <- function(input, output) {
                        filter(year == input$year), by = c("Name" ="country")))
   })
   
-  # plot co2 emission per year
+  # plot total emission per year
   pal_PerYear <- reactive({
-    colorBin("magma", domain = yearDF()$co2)})
+    colorBin("magma", domain = yearDF()$total)})
   mapPerYear <- renderLeaflet(
     leaflet(WorldCountry) %>%
       addTiles() %>%
       addPolygons(
-        fillColor = ~(pal_PerYear()(yearDF()$co2)),
+        fillColor = ~(pal_PerYear()(yearDF()$total)),
         weight = 2,
         opacity = 1,
         color = "white",
@@ -96,21 +95,21 @@ server <- function(input, output) {
           fillOpacity = 0.7,
           bringToFront = TRUE),
         label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>",
-                             "CO2:", yearDF()$co2)
+                             input$species, yearDF()$total)
                        , HTML)) %>%
-      addLegend(pal = pal_PerYear(), values = yearDF()$co2,
-                title = "CO2", position = "bottomright")
+      addLegend(pal = pal_PerYear(), values = yearDF()$total,
+                title = input$species, position = "bottomright")
   )
   output$mapPerYear <- mapPerYear
 
-  # plot co2 emission per year and per capita
+  # plot emission per year and per capita
   pal_PerCap <- reactive({
-    colorBin("magma", domain = yearDF()$co2_per_capita)})
+    colorBin("magma", domain = yearDF()$per_capita)})
   mapPerCap <- renderLeaflet(
     leaflet(WorldCountry) %>%
       addTiles() %>%
       addPolygons(
-        fillColor = ~(pal_PerCap()(yearDF()$co2_per_capita)),
+        fillColor = ~(pal_PerCap()(yearDF()$per_capita)),
         weight = 2,
         opacity = 1,
         color = "white",
@@ -121,21 +120,21 @@ server <- function(input, output) {
           fillOpacity = 0.7,
           bringToFront = TRUE),
         label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>",
-                             "CO2:", yearDF()$co2_per_capita)
+                             input$species, yearDF()$per_capita)
                        , HTML)) %>%
-      addLegend(pal = pal_PerCap(), values = yearDF()$co2_per_capita,
-                title = "CO2 per Capita", position = "bottomright")
+      addLegend(pal = pal_PerCap(), values = yearDF()$per_capita,
+                title = input$species, position = "bottomright")
   )
   output$mapPerCap <- mapPerCap
   
-  # plot co2 emission per year and per gdp
+  # plot emission per year and per gdp
   pal_PerGDP <- reactive({
-    colorBin("magma", domain = yearDF()$co2_per_gdp)})
+    colorBin("magma", domain = yearDF()$per_gdp)})
   mapPerGDP <- renderLeaflet(
     leaflet(WorldCountry) %>% 
       addTiles() %>% 
       addPolygons(
-        fillColor = ~(pal_PerGDP()(yearDF()$co2_per_gdp)),
+        fillColor = ~(pal_PerGDP()(yearDF()$per_gdp)),
         weight = 2,
         opacity = 1,
         color = "white",
@@ -146,10 +145,10 @@ server <- function(input, output) {
           fillOpacity = 0.7,
           bringToFront = TRUE), 
         label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>", 
-                             "CO2:", yearDF()$co2_per_gdp)
+                             input$species, yearDF()$per_gdp)
                        , HTML)) %>% 
-      addLegend(pal = pal_PerGDP(), values = yearDF()$co2_per_gdp,
-                title = "CO2 per GDP", position = "bottomright")
+      addLegend(pal = pal_PerGDP(), values = yearDF()$per_gdp,
+                title = input$species, position = "bottomright")
   )
   output$mapPerGDP <- mapPerGDP
 }
