@@ -36,35 +36,70 @@ catOfDF[[4]] <- selectDF %>%
           "per_gdp" = "nitrous_oxide_per_gdp")
 
 # Define UI for app that draws a histogram ----
-ui <- navbarPage(
-  
-  title = "Visualizing Greehouse Gas Emission",
-  theme = bslib::bs_theme(version = 4, bootswatch = "minty"),
-  tabPanel(
-    title = "Map",
-    sidebarLayout(
-      sidebarPanel(
-        title = "Explore GHG Emission",
-        sliderInput("year", "Select a Year:",
-                    min = min(selectDF$year), max = max(selectDF$year),
-                    value = 2000),
-        selectInput("species", "Select a type of GHG:", 
-                    c("Total GHG" = "total_ghg",
-                      "CO2" = "co2",
-                      "Methane" = 'methane',
-                      "Nitrous Oxide" = 'nitrous_oxide'))
-      ),
-      mainPanel(
+ui <- bootstrapPage(
+  tags$head(includeHTML("gtag.html")),
+  navbarPage(
+    title = "Visualizing Greehouse Gas Emission",
+    theme = bslib::bs_theme(version = 4, bootswatch = "minty"),
+    tabPanel("GHG mapper",
+      div(class="outer", tags$head(includeCSS("styles.css")),
+        title = "Map",
         tabsetPanel(type = "tabs",
-                    tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
-                    tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
-                    tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
+          tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
+          tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
+          tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
+        ),
+        absolutePanel(id = "controls", class = "panel panel-default",
+                      top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
+                      sliderInput("year", "Select a Year:",
+                        min = min(selectDF$year), max = max(selectDF$year),
+                        value = 2000),
+                      selectInput("species", "Select a type of GHG:",
+                        c("Total GHG" = "total_ghg",
+                        "CO2" = "co2",
+                        "Methane" = 'methane',
+                        "Nitrous Oxide" = 'nitrous_oxide'))
+                      
+          )
         )
-      )
+    ),
+    # tabPanel("Graphs", leafletOutput("mapPerYear")),
+    tabPanel("Data",
+              numericInput("maxrows", "Rows to show", 25),
+              verbatimTextOutput("rawtable"),
+              downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
+              "Adapted from timeline data published by ", tags$a(href="https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series",
+                                                                 "Johns Hopkins Center for Systems Science and Engineering.")
     )
+      
+      
+      
+      # sidebarLayout(
+      #   sidebarPanel(
+      #     title = "Explore GHG Emission",
+      #     sliderInput("year", "Select a Year:",
+      #                 min = min(selectDF$year), max = max(selectDF$year),
+      #                 value = 2000),
+      #   selectInput("species", "Select a type of GHG:",
+      #               c("Total GHG" = "total_ghg",
+      #                 "CO2" = "co2",
+      #                 "Methane" = 'methane',
+      #                 "Nitrous Oxide" = 'nitrous_oxide'))
+      # ),
+      #   mainPanel(
+      #     tabsetPanel(type = "tabs",
+      #                 tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
+      #                 tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
+      #                 tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
+      #     )
+      #   )
+      # )
+      
+      
+      
+    # tabPanel("Graphs", leafletOutput("mapPerYear")),
+    # tabPanel("Data", leafletOutput("mapPerYear"))
   )
-  # tabPanel("Graphs", leafletOutput("mapPerYear")),
-  # tabPanel("Data", leafletOutput("mapPerYear"))
 )
 
 # Define server logic required to draw a histogram ----
@@ -97,6 +132,7 @@ server <- function(input, output) {
         label = lapply(paste("<strong>", yearDF()$Name, "</strong>", "<br/>",
                              input$species, yearDF()$total)
                        , HTML)) %>%
+      fitBounds(~-100,-60,~60,70) %>% 
       addLegend(pal = pal_PerYear(), values = yearDF()$total,
                 title = input$species, position = "bottomright")
   )
