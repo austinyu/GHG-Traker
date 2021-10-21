@@ -41,14 +41,10 @@ ui <- bootstrapPage(
   navbarPage(
     title = "Visualizing Greehouse Gas Emission",
     theme = bslib::bs_theme(version = 4, bootswatch = "minty"),
-    tabPanel("GHG mapper",
+    tabPanel("Total GHG Map",
       div(class="outer", tags$head(includeCSS("styles.css")),
         title = "Map",
-        tabsetPanel(type = "tabs",
-          tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
-          tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
-          tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
-        ),
+        leafletOutput("mapPerYear", width="100%", height="100%"),
         absolutePanel(id = "controls", class = "panel panel-default",
                       top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
                       sliderInput("year", "Select a Year:",
@@ -59,9 +55,43 @@ ui <- bootstrapPage(
                         "CO2" = "co2",
                         "Methane" = 'methane',
                         "Nitrous Oxide" = 'nitrous_oxide'))
-                      
           )
         )
+    ),
+    tabPanel("GHG Per Capita Mapper",
+             div(class="outer", tags$head(includeCSS("styles.css")),
+                 title = "Map",
+                 leafletOutput("mapPerCap", width="100%", height="100%"),
+                 absolutePanel(id = "controls", class = "panel panel-default",
+                               top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
+                               sliderInput("year", "Select a Year:",
+                                           min = min(selectDF$year), max = max(selectDF$year),
+                                           value = 2000),
+                               selectInput("species", "Select a type of GHG:",
+                                           c("Total GHG" = "total_ghg",
+                                             "CO2" = "co2",
+                                             "Methane" = 'methane',
+                                             "Nitrous Oxide" = 'nitrous_oxide'))
+                 )
+             )
+    ),
+    tabPanel("GHG Per GDP Mapper",
+             div(class="outer", tags$head(includeCSS("styles.css")),
+                 title = "Map",
+                 leafletOutput("mapPerGDP", width="100%", height="100%"),
+                 absolutePanel(id = "controls", class = "panel panel-default",
+                               top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
+                               sliderInput("year", "Select a Year:",
+                                           min = min(selectDF$year), max = max(selectDF$year),
+                                           value = 2000),
+                               selectInput("species", "Select a type of GHG:",
+                                           c("Total GHG" = "total_ghg",
+                                             "CO2" = "co2",
+                                             "Methane" = 'methane',
+                                             "Nitrous Oxide" = 'nitrous_oxide'))
+                               
+                 )
+             )
     ),
     # tabPanel("Graphs", leafletOutput("mapPerYear")),
     tabPanel("Data",
