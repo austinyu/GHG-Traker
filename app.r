@@ -44,7 +44,7 @@ ui <- bootstrapPage(
     tabPanel("Total GHG Map",
       div(class="outer", tags$head(includeCSS("styles.css")),
         title = "Map",
-        leafletOutput("mapPerYear", width="100%", height="100%"),
+        leafletOutput("mymap", width="100%", height="100%"),
         absolutePanel(id = "controls", class = "panel panel-default",
                       top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
                       sliderInput("year", "Select a Year:",
@@ -54,44 +54,13 @@ ui <- bootstrapPage(
                         c("Total GHG" = "total_ghg",
                         "CO2" = "co2",
                         "Methane" = 'methane',
-                        "Nitrous Oxide" = 'nitrous_oxide'))
+                        "Nitrous Oxide" = 'nitrous_oxide'), selected = "co2"),
+                      selectInput("kind", "Select a Map:",
+                                  c("Total Emission" = "Total Emission",
+                                    "Per Capita" = "Per Capita",
+                                    "Per GDP" = 'Per GDP'))
           )
         )
-    ),
-    tabPanel("GHG Per Capita Mapper",
-             div(class="outer", tags$head(includeCSS("styles.css")),
-                 title = "Map",
-                 leafletOutput("mapPerCap", width="100%", height="100%"),
-                 absolutePanel(id = "controls", class = "panel panel-default",
-                               top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
-                               sliderInput("year", "Select a Year:",
-                                           min = min(selectDF$year), max = max(selectDF$year),
-                                           value = 2000),
-                               selectInput("species", "Select a type of GHG:",
-                                           c("Total GHG" = "total_ghg",
-                                             "CO2" = "co2",
-                                             "Methane" = 'methane',
-                                             "Nitrous Oxide" = 'nitrous_oxide'))
-                 )
-             )
-    ),
-    tabPanel("GHG Per GDP Mapper",
-             div(class="outer", tags$head(includeCSS("styles.css")),
-                 title = "Map",
-                 leafletOutput("mapPerGDP", width="100%", height="100%"),
-                 absolutePanel(id = "controls", class = "panel panel-default",
-                               top = 150, left = 55, width = 250, fixed=TRUE, height = "auto", draggable = TRUE,
-                               sliderInput("year", "Select a Year:",
-                                           min = min(selectDF$year), max = max(selectDF$year),
-                                           value = 2000),
-                               selectInput("species", "Select a type of GHG:",
-                                           c("Total GHG" = "total_ghg",
-                                             "CO2" = "co2",
-                                             "Methane" = 'methane',
-                                             "Nitrous Oxide" = 'nitrous_oxide'))
-                               
-                 )
-             )
     ),
     # tabPanel("Graphs", leafletOutput("mapPerYear")),
     tabPanel("Data",
@@ -101,34 +70,6 @@ ui <- bootstrapPage(
               "Adapted from timeline data published by ", tags$a(href="https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series",
                                                                  "Johns Hopkins Center for Systems Science and Engineering.")
     )
-      
-      
-      
-      # sidebarLayout(
-      #   sidebarPanel(
-      #     title = "Explore GHG Emission",
-      #     sliderInput("year", "Select a Year:",
-      #                 min = min(selectDF$year), max = max(selectDF$year),
-      #                 value = 2000),
-      #   selectInput("species", "Select a type of GHG:",
-      #               c("Total GHG" = "total_ghg",
-      #                 "CO2" = "co2",
-      #                 "Methane" = 'methane',
-      #                 "Nitrous Oxide" = 'nitrous_oxide'))
-      # ),
-      #   mainPanel(
-      #     tabsetPanel(type = "tabs",
-      #                 tabPanel("Emission Per Year", leafletOutput("mapPerYear")),
-      #                 tabPanel("Emission Per Capita", leafletOutput("mapPerCap")),
-      #                 tabPanel("Emission Per GDP", leafletOutput("mapPerGDP"))
-      #     )
-      #   )
-      # )
-      
-      
-      
-    # tabPanel("Graphs", leafletOutput("mapPerYear")),
-    # tabPanel("Data", leafletOutput("mapPerYear"))
   )
 )
 
@@ -144,7 +85,7 @@ server <- function(input, output) {
   
   # plot total emission per year
   pal_PerYear <- reactive({
-    colorBin("magma", domain = yearDF()$total)})
+    colorBin("Oranges", domain = yearDF()$total, pretty = TRUE)})
   mapPerYear <- renderLeaflet(
     leaflet(WorldCountry) %>%
       addTiles() %>%
@@ -164,13 +105,12 @@ server <- function(input, output) {
                        , HTML)) %>%
       fitBounds(~-100,-60,~60,70) %>% 
       addLegend(pal = pal_PerYear(), values = yearDF()$total,
-                title = input$species, position = "bottomright")
+                title = paste(input$species, input$kind, sep=" "), position = "bottomright")
   )
-  output$mapPerYear <- mapPerYear
 
   # plot emission per year and per capita
   pal_PerCap <- reactive({
-    colorBin("magma", domain = yearDF()$per_capita)})
+    colorBin("Oranges", domain = yearDF()$per_capita, pretty = TRUE)})
   mapPerCap <- renderLeaflet(
     leaflet(WorldCountry) %>%
       addTiles() %>%
@@ -189,13 +129,12 @@ server <- function(input, output) {
                              input$species, yearDF()$per_capita)
                        , HTML)) %>%
       addLegend(pal = pal_PerCap(), values = yearDF()$per_capita,
-                title = input$species, position = "bottomright")
+                title = paste(input$species, input$kind, sep=" "), position = "bottomright")
   )
-  output$mapPerCap <- mapPerCap
   
   # plot emission per year and per gdp
   pal_PerGDP <- reactive({
-    colorBin("magma", domain = yearDF()$per_gdp)})
+    colorBin("Oranges", domain = yearDF()$per_gdp, pretty = TRUE)})
   mapPerGDP <- renderLeaflet(
     leaflet(WorldCountry) %>% 
       addTiles() %>% 
@@ -214,10 +153,13 @@ server <- function(input, output) {
                              input$species, yearDF()$per_gdp)
                        , HTML)) %>% 
       addLegend(pal = pal_PerGDP(), values = yearDF()$per_gdp,
-                title = input$species, position = "bottomright")
+                title = paste(input$species, input$kind, sep=" "), position = "bottomright")
   )
-  output$mapPerGDP <- mapPerGDP
+  observeEvent(input$kind, {
+  if (input$kind == "Total Emission") {output$mymap <- mapPerYear}
+  if (input$kind == "Per Capita") {output$mymap <-  mapPerCap}
+  if (input$kind == "Per GDP") {output$mymap <-  mapPerGDP}
+  })
 }
-
 
 shinyApp(ui = ui, server = server)
