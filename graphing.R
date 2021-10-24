@@ -6,7 +6,7 @@ library(tidyverse)
 library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
 library(htmltools) 
 
-rawDF <- read_csv("/Users/chenxingliu/Desktop/FAll\ 2021/STA-230/Rshiny/STA230_RShiny/input_data/rawDF.csv")
+rawDF <- read_csv("input_data/rawDF.csv")
 selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
                       "total_ghg", "ghg_per_capita", "ghg_per_gdp",
                       "methane", "methane_per_capita", "methane_per_gdp",

@@ -193,12 +193,24 @@ ui <- bootstrapPage(
                )
       )
     ),
-    tabPanel("Data",
-              numericInput("maxrows", "Rows to show", 25),
-              verbatimTextOutput("rawtable"),
+    tabPanel("About This Site",
+             tags$div(
+               tags$h3("About"), 
+               "This is a visual illustration of green house gas emission data. Various visualization including maps, line plots, and bar plots are organized in different tabs. ",
+               
+               tags$br(),tags$br(),tags$h3("Code"),
+               "Code and input data used to generate this Shiny App is on ",tags$a(href="https://github.com/austinyu/STA230_RShiny", "Github."),
+               tags$br(),tags$br(),tags$h3("Authors"),
+               tags$a(href="https://github.com/austinyu", "Xinmiao Yu"), tags$br(),
+               tags$a(href="https://github.com/Luoyu826", "Luoyu Zhang"), tags$br(),
+               tags$a(href="https://github.com/TML17", "Chengxin Liu"), tags$br(),
+    
+              tags$br(),tags$h3("Reference"),
+               
               downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
               "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
                                                                  "Our World in Data.")
+             )
     )
   )
 )
