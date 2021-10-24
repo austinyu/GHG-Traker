@@ -3,12 +3,13 @@
 # library(leaflet)
 # library(RColorBrewer)
 # library(ggplot2)
-# library(tidyverse) 
+library(tidyverse)
 # library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
 # library(htmltools)  # Used for constructing map labels using HTML
 # library(shinyWidgets)
 
 # load required packages
+library(tidyverse)
 if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
 if(!require(rvest)) install.packages("rvest", repos = "http://cran.us.r-project.org")
 if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
