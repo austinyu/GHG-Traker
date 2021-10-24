@@ -12,12 +12,115 @@ selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
                       "methane", "methane_per_capita", "methane_per_gdp",
                       "nitrous_oxide", 'nitrous_oxide_per_capita', "nitrous_oxide_per_gdp")]
 catOfDF <- vector(mode="list", length=4)
-line_chart <- function(catagory){
-  ggplot(data = selectDF,
-         mapping = aes(x = year, y = catagory)) +
-    labs(title = "The Emission of ", xlab = "year", ylab = catagory)+
-    geom_line() 
+
+### mapping functions ###
+#
+line_chart <- function(type_of_ghg = c("total_ghg", "co2", "methane", "nitrous_oxide"), type_of_map = c("Total Emission", "Per Capita", "Per GDP")){
+  if(type_of_ghg == "total_ghg" & type_of_map == "Total Emission"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$total_ghg)) + 
+      labs(title = "The Emission of GHG in Total", x = "year", y = "GHG in Total")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "co2" & type_of_map == "Total Emission"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$co2)) + 
+      labs(title = "The Emission of CO2 in Total", x = "year", y = "CO2 in Total")+
+      geom_col()
+  }
+  if(type_of_ghg == "methane" & type_of_map == "Total Emission"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$methane)) + 
+      labs(title = "The Emission of Methane in Total", x = "year", y = "Methane in Total")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "nitrous_oxide" & type_of_map == "Total Emission"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$nitrous_oxide)) + 
+      labs(title = "The Emission of Nitrous Oxide in Total", x = "year", y = "Nitrous Oxide in Total")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "total_ghg" & type_of_map == "Per Capita"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$ghg_per_capita)) + 
+      labs(title = "The Emission of GHG in Total", x = "year", y = "GHG per Capita")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "co2" & type_of_map == "Per Capita"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$co2_per_capita)) + 
+      labs(title = "The Emission of CO2 Per Capita", x = "year", y = "CO2 per Capita")+
+      geom_col()
+  }
+  if(type_of_ghg == "methane" & type_of_map == "Per Capita"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$methane_per_capita)) + 
+      labs(title = "The Emission of Methane Per Capita", x = "year", y = "Methane Per Capita")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "nitrous_oxide" & type_of_map == "Per Capita"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$nitrous_oxide_per_capita)) + 
+      labs(title = "The Emission of Nitrous Oxide Per Capita", x = "year", y = "Nitrous Oxide Per Capita")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "total_ghg" & type_of_map == "Per GDP"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$ghg_per_gdp)) + 
+      labs(title = "The Emission of GHG Per GDP", x = "year", y = "GHG Per GDP")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "co2" & type_of_map == "Per GDP"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$co2_per_gdp)) + 
+      labs(title = "The Emission of CO2 Per GDP", x = "year", y = "CO2 Per GDP")+
+      geom_col()
+  }
+  if(type_of_ghg == "methane" & type_of_map == "Per GDP"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$methane_per_gdp)) + 
+      labs(title = "The Emission of Methane Per GDP", x = "year", y = "Methane Per GDP")+
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  if(type_of_ghg == "nitrous_oxide" & type_of_map == "Per GDP"){
+    graph = ggplot(data = selectDF,
+                   mapping = aes(x = year, y = selectDF$nitrous_oxide_per_gdp)) + 
+      labs(title = "Emission of Nitrous Oxide Per GDP", x = "year", y = "Nitrous Oxide Per GDP") +
+      xlim(1990, 2019) + 
+      geom_col()
+  }
+  graph
 }
-line_chart(selectDF$co2)
-line_chart(selectDF$co2_per_capita)
+
+ui <- fluidPage(
+  sidebarPanel(position = "left",
+               selectInput("variable", "Select a type of GHG:", 
+                           c("Total GHG" = "total_ghg",
+                             "CO2" = "co2",
+                             "Methane" = "methane",
+                             "Nitrous Oxide" = "nitrous_oxide", selected = "co2")),
+               selectInput("kind", "Select a Map:",
+                           c("Total Emission" = "Total Emission",
+                             "Per Capita" = "Per Capita",
+                             "Per GDP" = 'Per GDP')),
+               plotOutput("line_chart")
+  )
+)
+
+server <- function(input, output) {
+  
+  output$line_chart <- renderPlot({
+    line_chart(input$variable, input$kind)
+  })
+}
+
+shinyApp(ui, server)
 
