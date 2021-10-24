@@ -67,8 +67,8 @@ ui <- bootstrapPage(
               numericInput("maxrows", "Rows to show", 25),
               verbatimTextOutput("rawtable"),
               downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
-              "Adapted from timeline data published by ", tags$a(href="https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series",
-                                                                 "Johns Hopkins Center for Systems Science and Engineering.")
+              "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
+                                                                 "Our World in Data.")
     )
   )
 )
@@ -159,6 +159,27 @@ server <- function(input, output) {
   if (input$kind == "Total Emission") {output$mymap <- mapPerYear}
   if (input$kind == "Per Capita") {output$mymap <-  mapPerCap}
   if (input$kind == "Per GDP") {output$mymap <-  mapPerGDP}
+  })
+  
+  
+  # output to download data
+  output$downloadCsv <- downloadHandler(
+    filename = function() {
+      paste("owid-co2-data.csv")
+    },
+    content = function(file) {
+      write.csv(rawDF, file)
+    }
+  )
+  
+  output$rawtable <- renderPrint({
+    printDF = rawDF %>% select(c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
+                               "total_ghg", "ghg_per_capita", "ghg_per_gdp",
+                               "methane", "methane_per_capita", "methane_per_gdp",
+                               "nitrous_oxide", 'nitrous_oxide_per_capita', "nitrous_oxide_per_gdp"))
+    orig <- options(width = 1000)
+    print(tail(printDF, input$maxrows), row.names = FALSE)
+    options(orig)
   })
 }
 
