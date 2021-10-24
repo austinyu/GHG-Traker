@@ -1,30 +1,12 @@
 
-# library(shiny)
-# library(leaflet)
-# library(RColorBrewer)
-# library(ggplot2)
-# library(tidyverse) 
-# library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
-# library(htmltools)  # Used for constructing map labels using HTML
-# library(shinyWidgets)
-
-# load required packages
-if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
-if(!require(rvest)) install.packages("rvest", repos = "http://cran.us.r-project.org")
-if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
-if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-if(!require(maps)) install.packages("maps", repos = "http://cran.us.r-project.org")
-if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
-if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
-if(!require(ggiraph)) install.packages("ggiraph", repos = "http://cran.us.r-project.org")
-if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
-if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
-if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
-if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.us.r-project.org")
-if(!require(shiny)) install.packages("shiny", repos = "http://cran.us.r-project.org")
-if(!require(shinyWidgets)) install.packages("shinyWidgets", repos = "http://cran.us.r-project.org")
-if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.us.r-project.org")
-if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.us.r-project.org")
+library(shiny)
+library(leaflet)
+library(RColorBrewer)
+library(ggplot2)
+library(tidyverse) 
+library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
+library(htmltools)  # Used for constructing map labels using HTML
+library(reshape2)
 
 rawDF <- read_csv("input_data/rawDF.csv") 
 selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
@@ -54,80 +36,6 @@ catOfDF[[4]] <- selectDF %>%
           "per_capita" = "nitrous_oxide_per_capita",
           "per_gdp" = "nitrous_oxide_per_gdp")
 
-co2_year_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & co2!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = co2, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("co2 emission") +  xlab("Year") + theme_bw() + 
-    #    scale_colour_manual(values=c(covid_col)) +
-    #   scale_y_continuous(labels = function(l) {trans = l / 1000000; paste0(trans, "M")}) +
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-co2_per_capita_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & co2_per_capita!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = co2_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("co2_per_capita") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-ch4_year_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & methane!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = methane, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("methane emission") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-ch4_per_capita_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & methane_per_capita!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = methane_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("methane_per_capita") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-no2_year_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & nitrous_oxide!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = nitrous_oxide, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("no2 emission") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-no2_per_capita_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & nitrous_oxide_per_capita!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = nitrous_oxide_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("no2_per_capita") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-total_ghg_plot<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & total_ghg!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = total_ghg, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("total greenhouse gas emission") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
-total_ghg_per_capita<-function(input, coun, year1, year2) {
-  plot_df = subset(input, year>=year1 & year<=year2 & ghg_per_capita!=0 & country == coun)
-  g1 = ggplot(plot_df, aes(x = year, y = ghg_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
-    ylab("total_greenhouse_gas_per_capita") +  xlab("Year") + theme_bw() + 
-    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
-          plot.margin = margin(5, 12, 5, 5))
-  g1
-}
-
 # Define UI for app that draws a histogram ----
 ui <- bootstrapPage(
   tags$head(includeHTML("gtag.html")),
@@ -155,49 +63,13 @@ ui <- bootstrapPage(
           )
         )
     ),
-    tabPanel("Line Plots",
-             
-             sidebarLayout(
-               sidebarPanel(
-                 
-                 span(tags$i(h3("Line Plot for GHG Emission"))),
-                 
-                 pickerInput("country_select", "Country/Region:",
-                             choices = distinct(selectDF[order(-selectDF$co2),],country),
-                             #options = list(`actions-box` = TRUE, `none-selected-text` = "Please make a selection!"),
-                             selected = as.character(selectDF[order(-selectDF$co2),]$country)[0],
-                             multiple = FALSE),
-
-               selectInput("type_selected", "Type of GHG:",
-                            c("Total GHG" = "total_ghg",
-                               "CO2" = "co2",
-                               "Methane" = 'methane',
-                               "Nitrous Oxide" = 'nitrous_oxide'), selected = "co2"),
-                 sliderInput("start_year", "Select Start Year",
-                            min = min(selectDF$year), max = max(selectDF$year),
-                           value = 1980),
-                 sliderInput("end_year", "Select End Year",
-                           min = min(selectDF$year), max = max(selectDF$year),
-                           value = 2000),
-               #   
-               #   "Select outcome, regions, and plotting start date from drop-down menues to update plots. Countries with at least 1000 confirmed cases are included."
-               ),
-
-               mainPanel(
-                 
-                 tabsetPanel(
-                   tabPanel("Total Emission", plotlyOutput("lineplot_total")),
-                   tabPanel("Emition Per Capita", plotlyOutput("lineplot_perCap"))
-                 )
-               )
-      )
-    ),
+    # tabPanel("Graphs", leafletOutput("mapPerYear")),
     tabPanel("Data",
               numericInput("maxrows", "Rows to show", 25),
               verbatimTextOutput("rawtable"),
               downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
-              "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
-                                                                 "Our World in Data.")
+              "Adapted from timeline data published by ", tags$a(href="https://github.com/austinyu/STA230_RShiny/blob/main/raw_data/owid-co2-data.csv",
+                                                                 "where to find the source.")
     )
   )
 )
@@ -289,69 +161,6 @@ server <- function(input, output) {
   if (input$kind == "Per Capita") {output$mymap <-  mapPerCap}
   if (input$kind == "Per GDP") {output$mymap <-  mapPerGDP}
   })
-
-  observeEvent(input$type_selected, {
-    if (input$type_selected == "total_ghg") {output$lineplot_total <- renderPlotly({
-        total_ghg_plot(selectDF, input$country_select, input$start_year, input$end_year)
-      })
-    }
-    if (input$type_selected == "co2") {output$lineplot_total <-  renderPlotly({
-        co2_year_plot(selectDF, input$country_select, input$start_year, input$end_year)
-      })
-    }
-    if (input$type_selected == "methane") {output$lineplot_total <-  renderPlotly({
-        ch4_year_plot(selectDF, input$country_select, input$start_year, input$end_year)
-      })
-    }
-    if (input$type_selected == "nitrous_oxide") {output$lineplot_total <-  renderPlotly({
-        no2_year_plot(selectDF, input$country_select, input$start_year, input$end_year)
-      })
-    }
-  })
-  
-  observeEvent(input$type_selected, {
-    if (input$type_selected == "total_ghg") {output$lineplot_perCap <- renderPlotly({
-      total_ghg_per_capita(selectDF, input$country_select, input$start_year, input$end_year)
-    })
-    }
-    if (input$type_selected == "co2") {output$lineplot_perCap <-  renderPlotly({
-      co2_per_capita_plot(selectDF, input$country_select, input$start_year, input$end_year)
-    })
-    }
-    if (input$type_selected == "methane") {output$lineplot_perCap <-  renderPlotly({
-      ch4_per_capita_plot(selectDF, input$country_select, input$start_year, input$end_year)
-    })
-    }
-    if (input$type_selected == "nitrous_oxide") {output$lineplot_perCap <-  renderPlotly({
-      no2_per_capita_plot(selectDF, input$country_select, input$start_year, input$end_year)
-    })
-    }
-  })
-  
-  
-
-  
-  # output to download data
-  output$downloadCsv <- downloadHandler(
-    filename = function() {
-      paste("owid-co2-data.csv")
-    },
-    content = function(file) {
-      write.csv(rawDF, file)
-    }
-  )
-  
-  output$rawtable <- renderPrint({
-    printDF = rawDF %>% select(c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
-                               "total_ghg", "ghg_per_capita", "ghg_per_gdp",
-                               "methane", "methane_per_capita", "methane_per_gdp",
-                               "nitrous_oxide", 'nitrous_oxide_per_capita', "nitrous_oxide_per_gdp"))
-    orig <- options(width = 1000)
-    print(tail(printDF, input$maxrows), row.names = FALSE)
-    options(orig)
-  })
-  
-  
 }
 
 shinyApp(ui = ui, server = server)
