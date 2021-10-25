@@ -3,22 +3,21 @@
 # library(leaflet)
 # library(RColorBrewer)
 # library(ggplot2)
-library(tidyverse)
 # library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
 # library(htmltools)  # Used for constructing map labels using HTML
 # library(shinyWidgets)
 
 # load required packages
 library(tidyverse)
-if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
-if(!require(rvest)) install.packages("rvest", repos = "http://cran.us.r-project.org")
-if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
-if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-if(!require(maps)) install.packages("maps", repos = "http://cran.us.r-project.org")
+#if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
+#if(!require(rvest)) install.packages("rvest", repos = "http://cran.us.r-project.org")
+#if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
+#if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+#if(!require(maps)) install.packages("maps", repos = "http://cran.us.r-project.org")
 if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
-if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
-if(!require(ggiraph)) install.packages("ggiraph", repos = "http://cran.us.r-project.org")
-if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
+#if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
+#if(!require(ggiraph)) install.packages("ggiraph", repos = "http://cran.us.r-project.org")
+#if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
 if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
 if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
 if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.us.r-project.org")
@@ -26,6 +25,10 @@ if(!require(shiny)) install.packages("shiny", repos = "http://cran.us.r-project.
 if(!require(shinyWidgets)) install.packages("shinyWidgets", repos = "http://cran.us.r-project.org")
 if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.us.r-project.org")
 if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.us.r-project.org")
+if(!require(DataExplorer)) install.packages("DataExplorer", repos = "http://cran.us.r-project.org")
+if(!require(igraph)) install.packages("igraph", repos = "http://cran.us.r-project.org")
+if(!require(modeldata)) install.packages("modeldata", repos = "http://cran.us.r-project.org")
+if(!require(networkD3)) install.packages("networkD3", repos = "http://cran.us.r-project.org")
 
 rawDF <- read_csv("input_data/rawDF.csv") 
 selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
@@ -133,7 +136,7 @@ total_ghg_per_capita<-function(input, coun, year1, year2) {
 ui <- bootstrapPage(
   tags$head(includeHTML("gtag.html")),
   navbarPage(
-    title = "Visualizing Greehouse Gas Emission",
+    title = "Interactive GHG Traker",
     theme = bslib::bs_theme(version = 4, bootswatch = "minty"),
     tabPanel("Total GHG Map",
       div(class="outer", tags$head(includeCSS("styles.css")),
@@ -209,7 +212,8 @@ ui <- bootstrapPage(
                
               downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
               "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
-                                                                 "Our World in Data.")
+                                                                 "Our World in Data."), tags$br(),
+              "CSS and HTML style files are from ",  tags$a(href="https://github.com/eparker12/nCoV_tracker","nCoV_tracker")
              )
     )
   )
