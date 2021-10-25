@@ -75,6 +75,15 @@ co2_per_capita_plot<-function(input, coun, year1, year2) {
   g1
 }
 
+co2_per_gdp_plot<-function(input, coun, year1, year2) {
+  plot_df = subset(input, year>=year1 & year<=year2 & co2_per_gdp!=0 & country == coun)
+  g1 = ggplot(plot_df, aes(x = year, y = co2_per_gdp, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
+    ylab("co2_per_gdp") +  xlab("Year") + theme_bw() + 
+    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
+          plot.margin = margin(5, 12, 5, 5))
+  g1
+}
+
 ch4_year_plot<-function(input, coun, year1, year2) {
   plot_df = subset(input, year>=year1 & year<=year2 & methane!=0 & country == coun)
   g1 = ggplot(plot_df, aes(x = year, y = methane, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
@@ -88,6 +97,15 @@ ch4_per_capita_plot<-function(input, coun, year1, year2) {
   plot_df = subset(input, year>=year1 & year<=year2 & methane_per_capita!=0 & country == coun)
   g1 = ggplot(plot_df, aes(x = year, y = methane_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
     ylab("methane_per_capita") +  xlab("Year") + theme_bw() + 
+    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
+          plot.margin = margin(5, 12, 5, 5))
+  g1
+}
+
+ch4_per_gdp_plot<-function(input, coun, year1, year2) {
+  plot_df = subset(input, year>=year1 & year<=year2 & methane_per_gdp!=0 & country == coun)
+  g1 = ggplot(plot_df, aes(x = year, y = methane_per_gdp, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
+    ylab("methane_per_gdp") +  xlab("Year") + theme_bw() + 
     theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
           plot.margin = margin(5, 12, 5, 5))
   g1
@@ -111,6 +129,15 @@ no2_per_capita_plot<-function(input, coun, year1, year2) {
   g1
 }
 
+no2_per_gdp_plot<-function(input, coun, year1, year2) {
+  plot_df = subset(input, year>=year1 & year<=year2 & nitrous_oxide_per_gdp!=0 & country == coun)
+  g1 = ggplot(plot_df, aes(x = year, y = nitrous_oxide_per_gdp, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
+    ylab("no2_per_gdp") +  xlab("Year") + theme_bw() + 
+    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
+          plot.margin = margin(5, 12, 5, 5))
+  g1
+}
+
 total_ghg_plot<-function(input, coun, year1, year2) {
   plot_df = subset(input, year>=year1 & year<=year2 & total_ghg!=0 & country == coun)
   g1 = ggplot(plot_df, aes(x = year, y = total_ghg, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
@@ -124,6 +151,15 @@ total_ghg_per_capita<-function(input, coun, year1, year2) {
   plot_df = subset(input, year>=year1 & year<=year2 & ghg_per_capita!=0 & country == coun)
   g1 = ggplot(plot_df, aes(x = year, y = ghg_per_capita, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
     ylab("total_greenhouse_gas_per_capita") +  xlab("Year") + theme_bw() + 
+    theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
+          plot.margin = margin(5, 12, 5, 5))
+  g1
+}
+
+total_ghg_per_gdp<-function(input, coun, year1, year2) {
+  plot_df = subset(input, year>=year1 & year<=year2 & ghg_per_gdp!=0 & country == coun)
+  g1 = ggplot(plot_df, aes(x = year, y = ghg_per_gdp, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
+    ylab("total_greenhouse_gas_per_gdp") +  xlab("Year") + theme_bw() + 
     theme(legend.title = element_blank(), legend.position = "", plot.title = element_text(size=10), 
           plot.margin = margin(5, 12, 5, 5))
   g1
@@ -188,7 +224,8 @@ ui <- bootstrapPage(
                  
                  tabsetPanel(
                    tabPanel("Total Emission", plotlyOutput("lineplot_total")),
-                   tabPanel("Emition Per Capita", plotlyOutput("lineplot_perCap"))
+                   tabPanel("Emition Per Capita", plotlyOutput("lineplot_perCap")),
+                   tabPanel("Emition Per GDP", plotlyOutput("lineplot_perGDP"))
                  )
                )
       )
@@ -326,6 +363,25 @@ server <- function(input, output) {
     }
     if (input$type_selected == "nitrous_oxide") {output$lineplot_perCap <-  renderPlotly({
       no2_per_capita_plot(selectDF, input$country_select, input$start_year, input$end_year)
+    })
+    }
+  })
+  
+  observeEvent(input$type_selected, {
+    if (input$type_selected == "total_ghg") {output$lineplot_perGDP <- renderPlotly({
+      total_ghg_per_gdp(selectDF, input$country_select, input$start_year, input$end_year)
+    })
+    }
+    if (input$type_selected == "co2") {output$lineplot_perGDP <-  renderPlotly({
+      co2_per_gdp_plot(selectDF, input$country_select, input$start_year, input$end_year)
+    })
+    }
+    if (input$type_selected == "methane") {output$lineplot_perGDP <-  renderPlotly({
+      ch4_per_gdp_plot(selectDF, input$country_select, input$start_year, input$end_year)
+    })
+    }
+    if (input$type_selected == "nitrous_oxide") {output$lineplot_perGDP <-  renderPlotly({
+      no2_per_gdp_plot(selectDF, input$country_select, input$start_year, input$end_year)
     })
     }
   })
