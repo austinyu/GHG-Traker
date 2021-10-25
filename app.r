@@ -165,6 +165,49 @@ total_ghg_per_gdp<-function(input, coun, year1, year2) {
   g1
 }
 
+# comparing graph
+comparison <- function(which_year, checker = list("total_ghg", "methane", "nitrous_oxide")){
+  df <- data.frame(type = 0,
+                   emission = 0)
+  df <- df[-1,]
+  
+  if("ghg" %in% checker && !("methane" %in% checker) && !("nitrous_oxide" %in% checker)){
+    df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
+  }
+  else if(!("ghg" %in% checker) && "methane" %in% checker && !("nitrous_oxide" %in% checker)){
+    df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+  }
+  else if(!("ghg" %in% checker) && !("methane" %in% checker) && "nitrous_oxide" %in% checker){
+    df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+  }
+  
+  else if("ghg" %in% checker && "methane" %in% checker && !("nitrous_oxide" %in% checker)){
+    df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
+    df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+  }
+  else if(!("ghg" %in% checker) && "methane" %in% checker && "nitrous_oxide" %in% checker){
+    df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+    df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+  }
+  else if("ghg" %in% checker && !("methane" %in% checker) && "nitrous_oxide" %in% checker){
+    df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
+    df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+  }
+  else if("ghg" %in% checker && "methane" %in% checker && "nitrous_oxide" %in% checker){
+    df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
+    df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+    df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+  }
+  graph = ggplot(data = df,
+                 mapping = aes(x = df[ , 1], y = df[ , 2])) + 
+    geom_col(alpha = 0.8, stat="identity") + 
+    labs(title = "The Bar Plot Comparison",
+         y = "Amount of Emission",
+         x = "Type")
+  
+  graph
+}
+
 # Define UI for app that draws a histogram ----
 ui <- bootstrapPage(
   tags$head(includeHTML("gtag.html")),
@@ -230,6 +273,26 @@ ui <- bootstrapPage(
                )
       )
     ),
+    
+    tabPanel("Comparison",
+             sidebarLayout(
+               sidebarPanel(
+                 sliderInput("year", "Select a Year to Compare:",
+                             min = 1990, max = max(selectDF$year),
+                             value = 1990),
+                 checkboxGroupInput("checkGroup", 
+                                    h3("Choose Emission Types to Compare"), 
+                                    choices = list("GHG" = "ghg", 
+                                                   "Methane" = "methane", 
+                                                   "Nitrous Oxide" = "nitrous_oxide"),
+                                    selected = list("ghg", "methane", "nitrous_oxide")),
+               ),
+               mainPanel(
+                 plotOutput("comparison")
+               )
+             )
+    ),
+    
     tabPanel("Data",
               numericInput("maxrows", "Rows to show", 25),
               verbatimTextOutput("rawtable"),
@@ -409,7 +472,9 @@ server <- function(input, output) {
     options(orig)
   })
   
-  
+  output$comparison <- renderPlot({
+    comparison(input$year, input$checkGroup)
+  })
 }
 
 shinyApp(ui = ui, server = server)
