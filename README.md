@@ -1,98 +1,20 @@
-# STA230_RShiny
+## GreenhouseGas interactive Visualization
 
-## Feature Overview
+This repo contains the code for R Shiny App to visulize greenhouse gas emission data from [Our World in Data](https://github.com/owid/co2-data). Visulizations of the data include interactive maps, line plots and bar plots.
 
-### Tabs Overview
+## R Shinny App Interface
 
-- Map
-- Reigion Plot 
-- Data
-- Read Me
-- TBD
+Follow [this](https://austinyxm.shinyapps.io/GHG-Traker/) link for the interactive Shiny app. A screenshot of the interface is provided below.
 
-### Map Tab Features
+![Interface.png](www/Interface.png)
 
-> ref: https://vac-lshtm.shinyapps.io/ncov_tracker/?_ga=2.105219075.1262787308.1631749524-1000171401.1630379597
-- Slide bar for adjusting a specific year 
-- two graphs for trends 
-    - cumulative growth 
-    - yearly growth 
-- floating window? 
-- checkbox for other species of greenhouse gas 
-- mapping 
-    - color 
-    - bubble size 
-- legend 
+## Authors
 
-### Region Plot Features
+[Xinmiao Yu](https://github.com/austinyu), [Luoyu Zhang](https://github.com/Luoyu826), [Chengxin Liu](https://github.com/TML17)
 
-- Level selector (global, continents, country etc.) TBD
-- Outcome (total amount, per capita, per gdp etc)
+## References 
 
-### Read Me
+HTML and CSS Style files are adapted from [COVID-19 interactive mapping tool.](https://github.com/eparker12/nCoV_tracker) 
 
-- Instructions 
-
-### Data
-
-- references 
-
-Any updates?
-
-## Features
-
-- Basic Info
-  - Iso_code
-  - country
-  - year
-  - gdp
-  - population
-- co2
-  - co2
-  - Cumulative_co2
-  - Co2_per_gdp
-  - co2_per_unit_energy
-- source
-  - Cement_co2
-  - Coal_co2
-  - Flaring_co2
-  - Gas_co2
-  - Oil_co2
-- green house gas
-  - co2
-  - methane 
-  - Nitrous_oxide 
-
-## Assignment
-
-- Line Plot
-  - see the photo
-  - by country, sources, year, GHG type 
-- Bar Chart / piechart 
-  - Top 10 emissions 
-- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Dataset by [Our World in Data.](https://github.com/owid/co2-data) 
 

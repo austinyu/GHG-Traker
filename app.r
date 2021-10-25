@@ -313,8 +313,11 @@ ui <- bootstrapPage(
                
                downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
                "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
-                                                                                  "Our World in Data.")
+                                                                                  "Our World in Data."),tags$br(),tags$br(),
+               "HTML and CSS Style files are adapted from ", tags$a(href="https://github.com/eparker12/nCoV_tracker",
+                          "COVID-19 interactive mapping tool.")
              )
+             
     )
   )
 )
