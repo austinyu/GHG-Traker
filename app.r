@@ -281,7 +281,7 @@ ui <- bootstrapPage(
     tabPanel("Comparison",
              sidebarLayout(
                sidebarPanel(
-                 sliderInput("year", "Select a Year to Compare:",
+                 sliderInput("year_comparison", "Select a Year to Compare:",
                              min = 1990, max = max(selectDF$year),
                              value = 1990),
                  checkboxGroupInput("checkGroup", 
@@ -297,13 +297,23 @@ ui <- bootstrapPage(
              )
     ),
     
-    tabPanel("Data",
-              numericInput("maxrows", "Rows to show", 25),
-              verbatimTextOutput("rawtable"),
-              downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
-              "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
-                                                                 "Our World in Data."), tags$br(),
-              "CSS and HTML style files are from ",  tags$a(href="https://github.com/eparker12/nCoV_tracker","nCoV_tracker")
+    tabPanel("About This Site",
+             tags$div(
+               tags$h3("About"), 
+               "This is a visual illustration of green house gas emission data. Various visualization including maps, line plots, and bar plots are organized in different tabs. ",
+               
+               tags$br(),tags$br(),tags$h3("Code"),
+               "Code and input data used to generate this Shiny App is on ",tags$a(href="https://github.com/austinyu/STA230_RShiny", "Github."),
+               tags$br(),tags$br(),tags$h3("Authors"),
+               tags$a(href="https://github.com/austinyu", "Xinmiao Yu"), tags$br(),
+               tags$a(href="https://github.com/Luoyu826", "Luoyu Zhang"), tags$br(),
+               tags$a(href="https://github.com/TML17", "Chengxin Liu"), tags$br(),
+               
+               tags$br(),tags$h3("Reference"),
+               
+               downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
+               "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
+                                                                                  "Our World in Data.")
              )
     )
   )
@@ -479,7 +489,7 @@ server <- function(input, output) {
   })
   
   output$comparison <- renderPlot({
-    comparison(input$year, input$checkGroup)
+    comparison(input$year_comparison, input$checkGroup)
   })
 }
 
