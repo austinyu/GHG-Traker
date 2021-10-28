@@ -263,16 +263,15 @@ ui <- bootstrapPage(
                  sliderInput("end_year", "Select End Year",
                            min = min(selectDF$year), max = max(selectDF$year),
                            value = 2000),
-               #   
-               #   "Select outcome, regions, and plotting start date from drop-down menues to update plots. Countries with at least 1000 confirmed cases are included."
+                  "If the line plot is not displaying properly, it means that we don't have enough data from the selected choices to render a reasonable plot."
                ),
 
                mainPanel(
                  
                  tabsetPanel(
                    tabPanel("Total Emission", plotlyOutput("lineplot_total")),
-                   tabPanel("Emition Per Capita", plotlyOutput("lineplot_perCap")),
-                   tabPanel("Emition Per GDP", plotlyOutput("lineplot_perGDP"))
+                   tabPanel("Emission Per Capita", plotlyOutput("lineplot_perCap")),
+                   tabPanel("Emission Per GDP", plotlyOutput("lineplot_perGDP"))
                  )
                )
       )
@@ -312,10 +311,13 @@ ui <- bootstrapPage(
                tags$br(),tags$h3("Reference"),
                
                downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
-               "Adapted from data on CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
-                                                                                  "Our World in Data."),tags$br(),tags$br(),
                "HTML and CSS Style files are adapted from ", tags$a(href="https://github.com/eparker12/nCoV_tracker",
-                          "COVID-19 interactive mapping tool.")
+                          "COVID-19 interactive mapping tool."), tags$br(), tags$br(),
+               "Data set is from CO2 and Greenhouse Gas Emissions by", tags$a(href="https://github.com/owid/co2-data",
+                                                                                  "Our World in Data."), "which contains data from these sources. ",tags$br(),tags$br(),
+              "CO2 emissions: this data is sourced from the", tags$a(href="http://www.globalcarbonproject.org/carbonbudget", "Global Carbon Project"), "The Global Carbon Project typically releases a new update of CO2 emissions annually.", tags$br(),
+              "Greenhouse gas emissions (including methane, and nitrous oxide) this data is sourced from the CAIT Climate Data Explorer, and downloaded from the", tags$a(href="https://www.climatewatchdata.org/data-explorer/historical-emissionshttps://www.climatewatchdata.org/data-explorer/historical-emissions", "Climate Watch Portal"), tags$br(),
+              "Energy (primary energy, energy mix and energy intensity) this data is sourced from a combination of two sources. The", tags$a(href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html", "BP Statistical Review of World Energy"), "is published annually, but it does not provide data on primary energy consumption for all countries.", tags$br(),tags$br(),tags$br() 
              )
              
     )
@@ -467,9 +469,6 @@ server <- function(input, output) {
     })
     }
   })
-  
-  
-
   
   # output to download data
   output$downloadCsv <- downloadHandler(
