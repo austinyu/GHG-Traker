@@ -23,34 +23,48 @@ comparison <- function(which_year, checker = list("total_ghg", "methane", "nitro
 
   if("ghg" %in% checker && !("methane" %in% checker) && !("nitrous_oxide" %in% checker)){
     df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   else if(!("ghg" %in% checker) && "methane" %in% checker && !("nitrous_oxide" %in% checker)){
     df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   else if(!("ghg" %in% checker) && !("methane" %in% checker) && "nitrous_oxide" %in% checker){
     df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
 
   else if("ghg" %in% checker && "methane" %in% checker && !("nitrous_oxide" %in% checker)){
     df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
     df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   else if(!("ghg" %in% checker) && "methane" %in% checker && "nitrous_oxide" %in% checker){
     df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
     df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   else if("ghg" %in% checker && !("methane" %in% checker) && "nitrous_oxide" %in% checker){
     df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
     df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   else if("ghg" %in% checker && "methane" %in% checker && "nitrous_oxide" %in% checker){
     df <- rbind(df, c(type = "ghg", emission = sum(filter(selectDF, year == which_year)$total_ghg, na.rm = TRUE)))
     df <- rbind(df, c(type = "methane", emission = sum(filter(selectDF, year == which_year)$methane, na.rm = TRUE)))
     df <- rbind(df, c(type = "nitrous_oxide", emission = sum(filter(selectDF, year == which_year)$nitrous_oxide, na.rm = TRUE)))
+    colnames(df) <- c('type','emission')
+    df$emission <- as.double(df$emission)
   }
   graph = ggplot(data = df,
-                 mapping = aes(x = df[ , 1], y = df[ , 2])) +
-    geom_col(alpha = 0.8, stat="identity") +
+                 mapping = aes(x = emission, y = type)) +
+    geom_col() +
     labs(title = "The Bar Plot Comparison",
          y = "Amount of Emission",
          x = "Type")
