@@ -1,23 +1,6 @@
-
-# library(shiny)
-# library(leaflet)
-# library(RColorBrewer)
-# library(ggplot2)
-# library(geojsonio)  # A package for geographic and spatial data, requires the latest version of dplyr
-# library(htmltools)  # Used for constructing map labels using HTML
-# library(shinyWidgets)
-
-# load required packages
+# Load Required Packages
 library(tidyverse)
-#if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
-#if(!require(rvest)) install.packages("rvest", repos = "http://cran.us.r-project.org")
-#if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
-#if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-#if(!require(maps)) install.packages("maps", repos = "http://cran.us.r-project.org")
 if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
-#if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
-#if(!require(ggiraph)) install.packages("ggiraph", repos = "http://cran.us.r-project.org")
-#if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
 if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
 if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
 if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.us.r-project.org")
@@ -30,6 +13,8 @@ if(!require(igraph)) install.packages("igraph", repos = "http://cran.us.r-projec
 if(!require(modeldata)) install.packages("modeldata", repos = "http://cran.us.r-project.org")
 if(!require(networkD3)) install.packages("networkD3", repos = "http://cran.us.r-project.org")
 
+
+# Read in data set that will be visualizewd. 
 rawDF <- read_csv("input_data/rawDF.csv")
 selectDF <- rawDF[, c("country", "year", "co2", "co2_per_capita", "co2_per_gdp",
                       "total_ghg", "ghg_per_capita", "ghg_per_gdp",
@@ -59,6 +44,7 @@ catOfDF[[4]] <- selectDF %>%
           "per_gdp" = "nitrous_oxide_per_gdp")
 
 
+# Line plot functions
 co2_year_plot<-function(input, coun, year1, year2) {
   plot_df = subset(input, year>=year1 & year<=year2 & co2!=0 & country == coun)
   g1 = ggplot(plot_df, aes(x = year, y = co2, color = country)) + geom_line() + geom_point(size = 1, alpha = 0.8) +
@@ -169,7 +155,7 @@ total_ghg_per_gdp<-function(input, coun, year1, year2) {
   g1
 }
 
-# comparing graph
+# comparing graph functions
 comparison <- function(which_year, checker = list("total_ghg", "methane", "nitrous_oxide")){
   df <- data.frame(type = 0,
                    emission = 0)
@@ -262,7 +248,6 @@ ui <- bootstrapPage(
                  
                  pickerInput("country_select", "Country/Region:",
                              choices = distinct(selectDF[order(-selectDF$co2),],country),
-                             #options = list(`actions-box` = TRUE, `none-selected-text` = "Please make a selection!"),
                              selected = as.character(selectDF[order(-selectDF$co2),]$country)[0],
                              multiple = FALSE),
 
@@ -339,7 +324,7 @@ ui <- bootstrapPage(
 )
 # branch
 
-# Define server logic required to draw a histogram ----
+# Define server logic required  ----
 server <- function(input, output) {
   shapeurl <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
   WorldCountry <- geojson_read(shapeurl, what = "sp")
@@ -348,8 +333,7 @@ server <- function(input, output) {
     return(left_join(data.frame(Name = WorldCountry$name), catOfDF[[input$species]] %>%
                        filter(year == input$year), by = c("Name" ="country")))
   })
-
-  # plot total emission per year
+  # plot total emission per year in Map
   pal_PerYear <- reactive({
     colorBin("Oranges", domain = yearDF()$total, pretty = TRUE)})
   mapPerYear <- renderLeaflet(
@@ -421,12 +405,15 @@ server <- function(input, output) {
       addLegend(pal = pal_PerGDP(), values = yearDF()$per_gdp,
                 title = paste(input$species, input$kind, sep=" "), position = "bottomright")
   )
+  
+  # Render map based on kind selected
   observeEvent(input$kind, {
   if (input$kind == "Total Emission") {output$mymap <- mapPerYear}
   if (input$kind == "Per Capita") {output$mymap <-  mapPerCap}
   if (input$kind == "Per GDP") {output$mymap <-  mapPerGDP}
   })
 
+  # Line plots
   observeEvent(input$type_selected, {
     if (input$type_selected == "total_ghg") {output$lineplot_total <- renderPlotly({
         total_ghg_plot(selectDF, input$country_select, input$start_year, input$end_year)
@@ -484,6 +471,11 @@ server <- function(input, output) {
     }
   })
   
+  # Plot comparison bar plot
+  output$comparison <- renderPlot({
+    comparison(input$year_comparison, input$checkGroup)
+  })
+  
   # output to download data
   output$downloadCsv <- downloadHandler(
     filename = function() {
@@ -502,10 +494,6 @@ server <- function(input, output) {
     orig <- options(width = 1000)
     print(tail(printDF, input$maxrows), row.names = FALSE)
     options(orig)
-  })
-  
-  output$comparison <- renderPlot({
-    comparison(input$year_comparison, input$checkGroup)
   })
 }
 
