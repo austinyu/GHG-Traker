@@ -2,7 +2,7 @@
 
 This repo contains the code for R Shiny App to visulize greenhouse gas emission data from [Our World in Data](https://github.com/owid/co2-data). Visulizations of the data include interactive maps, line plots and bar plots.
 
-## R Shinny App Interface
+## Demo
 
 Follow [this](https://austinyxm.shinyapps.io/GHG-Traker/) link for the interactive Shiny app. A screenshot of the interface is provided below.
 
